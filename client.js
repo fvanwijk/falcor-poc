@@ -29,7 +29,6 @@ const speciesColors = {
 model
   .get('pokemon[0..10].["name", "species", "image"]')
   .then((result) => {
-    debugger;
     const pokemonObject = result.json.pokemon;
     const pokemonArray = Object.keys(pokemonObject)
       .map(key => pokemonObject[key]);
