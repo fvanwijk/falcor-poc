@@ -27,8 +27,16 @@ function renderTiles(tiles) {
 }
 
 function tileToDom(tile) {
+  const header = document.createElement('h2');
+  header.appendChild(document.createTextNode(tile.title));
+
   const img = document.createElement('img');
   img.src = tile.src;
   img.alt = tile.title;
-  return img;
+  
+  const tileDom = document.createElement('div');
+  tileDom.appendChild(header);
+  tileDom.appendChild(img);
+
+  return tileDom;
 }
