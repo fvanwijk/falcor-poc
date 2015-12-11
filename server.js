@@ -15,25 +15,48 @@ function filter(list, range) {
   return result;
 }
 
+
 app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
   // create a Virtual JSON resource with single key ("greeting")
   return new Router([
     {
       // match a request for the key "greeting"
-      route: 'pokemon[{ranges:indexRanges}].["name", "species"]',
+      route: 'pokemon[{keys:range}].[{keys:props}]',
       // respond with a PathValue with the value of "Hello World."
       get(pathSet) {
-        const result = [];
-        const range = pathSet.indexRanges[0];
-        for(var i = range.from; i <= range.to; i++) {
-          result.push({path: ['pokemon', i, ['name', 'species']], value: 'ssdsdf'});
-        }
-        return Promise.resolve(result);
+        console.log(pathSet);
+        const props = pathSet.props;
+        return fetchPokeApi('api/v1/pokedex/1/')
+          .then(response => pathSet.range
+            .map(i => {
+              const pokemonResource = response.pokemon[i].resource_uri;
+              const pokemonProps = fetchPropsFromResource(props, pokemonResource);
+              return pokemonProps.then(value => ({path: [pathSet[0], i], value}));
+            })
+          )
+          .then(resultPromises => Promise.all(resultPromises));
       }
     }
-
   ]);
 }));
+
+function fetchPropsFromResource(props, resource) {
+  return fetchPokeApi(resource)
+    .then(response => {
+        const result = {};
+        props.map(prop => {
+          return result[prop] = response[prop]
+        });
+        return result;
+      }
+    );
+}
+
+const endpoint = 'http://pokeapi.co/';
+function fetchPokeApi(resource) {
+  return fetch(`${endpoint}${resource}`)
+    .then(response => response.json());
+}
 
 // serve static files from current directory
 app.use(express.static(__dirname + '/'));

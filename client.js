@@ -4,8 +4,9 @@ const model = new falcor.Model({
 //model.get('pokemon["name", "species"]').then(pokemon   => console.log(pokemon));
 
 model
-  .get('pokemon[0..10].["name", "species"]')
+  .get('pokemon[0..10].["name", "attack"]')
   .then((result) => {
+    debugger;
     const pokemonObject = result.json.pokemon;
     const pokemonArray = Object.keys(pokemonObject)
       .map(key => pokemonObject[key]);
