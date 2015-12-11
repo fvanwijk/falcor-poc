@@ -4,6 +4,7 @@
   "description": "This is a sample falcor project",
   "main": "index.js",
   "dependencies": {
+    "bootstrap": "4.0.0-alpha.2",
     "express": "^4.13.3",
     "falcor-express": "^0.1.2",
     "falcor-router": "^0.2.12"
