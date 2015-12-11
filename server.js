@@ -18,7 +18,6 @@ function filter(list, range) {
 }
 
 function parseId(resource) {
-  console.log(resource);
   return /(\d+)\/$/.exec(resource)[1];
 }
 
@@ -29,6 +28,7 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
       // match a request for the key "greeting"
       route: 'pokedex[{keys:range}]',
       get(pathSet) {
+        console.log(pathSet);
         return fetchPokeApi('api/v1/pokedex/1/')
           .then(response => pathSet.range
             .map(i => {
@@ -43,14 +43,17 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
       // match a request for the key "greeting"
       route: 'pokemonById[{keys:ids}][{keys:props}]',
       get(pathSet) {
+        console.log(pathSet);
         const props = pathSet.props;
         const pokemonPromises = pathSet.ids
           .map(id => {
-            const pokemonProps = fetchPropsFromResource(props, `api/v1/pokemon/${id}/`);
-            return pokemonProps.then(value => ({path: [pathSet[0], id], value}));
+            const pokemonValue = fetchPropsFromResource(props, `api/v1/pokemon/${id}/`);
+            return pokemonValue
+              .then(pokemonValue => props
+                .map(prop => ({path: [pathSet[0], id, prop], value: pokemonValue[prop]})));
           });
 
-        return Promise.all(pokemonPromises);
+        return Promise.all(pokemonPromises).then(flatten);
       }
     },
     {
@@ -83,6 +86,10 @@ const endpoint = 'http://pokeapi.co/';
 function fetchPokeApi(resource) {
   return fetch(`${endpoint}${resource}`)
     .then(response => response.json());
+}
+
+function flatten(array) {
+  return Array.prototype.concat.apply([], array);
 }
 
 // serve static files from current directory
