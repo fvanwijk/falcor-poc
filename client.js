@@ -1,17 +1,16 @@
 var model = new falcor.Model({
-  cache: {
-    user: {
-      name: "Frank",
-      surname: "Underwood",
-      address: "1600 Pennsylvania Avenue, Washington, DC"
-    }
-  }
+  source: new falcor.HttpDataSource('/model.json')
 });
 
 model
-  .getValue('user.surname')
-  .then(function(surname) {
-    console.log(surname);
+  .getValue('greeting')
+  .then(function(name) {
+    renderTiles([
+      {
+        title: name,
+        src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg?w=50&h=50'
+      }
+    ])
   });
 
 renderTiles([{
