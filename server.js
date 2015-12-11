@@ -29,4 +29,5 @@ app.use('/model.json', falcorExpress.dataSourceRoute(function (req, res) {
 // serve static files from current directory
 app.use(express.static(__dirname + '/'));
 
+console.log("Server listening on http://localhost:3000");
 var server = app.listen(3000);
