@@ -13,17 +13,10 @@ model
     ])
   });
 
-renderTiles([{
-  title: 'falcor',
-  src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg?w=590&h=442'
-}]);
-
 function renderTiles(tiles) {
   const contentDiv = document.querySelector('#content');
-  contentDiv.innerHTML = '';
-  tiles
-    .map(tile => tileToHtml(tile))
-    .forEach(tileHtml => contentDiv.insertAdjacentHTML('afterend', tileHtml))
+  contentDiv.innerHTML = tiles
+    .map(tile => tileToHtml(tile)).join('');
 }
 
 function tileToHtml(tile) {
