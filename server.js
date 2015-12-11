@@ -54,18 +54,6 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
       }
     },
     {
-      // match a request for the key "greeting"
-      route: 'pokemon[{integers:indices}].image',
-      // respond with a PathValue with the value of "Hello World."
-      get(pathSet) {
-        const result = [];
-        pathSet.indices.forEach(function (i) {
-          result.push({path: ['pokemon', i, ['image']], value: 'my image'});
-        });
-        return Promise.resolve(result);
-      }
-    },
-    {
       route: 'type[{integers:typeId}]',
       get(pathSet) {
         return fetchPokeApi(`api/v1/type/${pathSet.typeId[0]}/`)
