@@ -3,10 +3,11 @@ const model = new falcor.Model({
 });
 
 model
-  .get('greeting[0..10].name')
+  .get('pokemon[0..10].name')
   .then((result) => {
-    const tiles = Object.keys(result.json.greeting)
-      .map(key => result.json.greeting[key])
+    const pokemon = result.json.pokemon;
+    const tiles = Object.keys(pokemon)
+      .map(key => pokemon[key])
       .map(pokemon => ({
         title: pokemon.name,
         src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'

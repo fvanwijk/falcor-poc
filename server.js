@@ -11,13 +11,13 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
   return new Router([
     {
       // match a request for the key "greeting"
-      route: 'greeting',
+      route: 'pokemon',
       // respond with a PathValue with the value of "Hello World."
       get() {
         return fetch('http://pokeapi.co/api/v1/pokedex/1/')
           .then(response => response.json())
           .then(response => ({
-            path: ['greeting'], value: response.pokemon
+            path: ['pokemon'], value: response.pokemon
           }));
       }
     }
