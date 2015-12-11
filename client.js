@@ -21,22 +21,12 @@ renderTiles([{
 
 function renderTiles(tiles) {
   const contentDiv = document.querySelector('#content');
+  contentDiv.innerHTML = '';
   tiles
-    .map(tile => tileToDom(tile))
-    .forEach(domTile => contentDiv.appendChild(domTile))
+    .map(tile => tileToHtml(tile))
+    .forEach(tileHtml => contentDiv.insertAdjacentHTML('afterend', tileHtml))
 }
 
-function tileToDom(tile) {
-  const header = document.createElement('h2');
-  header.appendChild(document.createTextNode(tile.title));
-
-  const img = document.createElement('img');
-  img.src = tile.src;
-  img.alt = tile.title;
-  
-  const tileDom = document.createElement('div');
-  tileDom.appendChild(header);
-  tileDom.appendChild(img);
-
-  return tileDom;
+function tileToHtml(tile) {
+  return `<h2>${tile.title}</h2><img src="${tile.src} alt=${tile.title}"/>`;
 }
