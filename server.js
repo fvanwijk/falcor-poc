@@ -20,7 +20,18 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
             path: ['pokemon'], value: response.pokemon
           }));
       }
+    },{
+    route: 'pokemon["name", "species"]',
+    get() {
+      return fetch('http://pokeapi.co/api/v1/pokemon/1')
+        .then(response => response.json())
+        .then(pokemon => ([
+          {path:['pokemon', 'name'], value:pokemon.name},
+          {path:['pokemon', 'species'], value:pokemon.species}
+        ]));
     }
+}
+
   ]);
 }));
 

@@ -1,19 +1,27 @@
 const model = new falcor.Model({
-  source: new falcor.HttpDataSource('/model.json')
-});
+  source: new falcor.HttpDataSource('/model.json')});
 
-model
-  .get('pokemon[0..10].name')
-  .then((result) => {
-    const pokemon = result.json.pokemon;
-    const tiles = Object.keys(pokemon)
-      .map(key => pokemon[key])
-      .map(pokemon => ({
-        title: pokemon.name,
-        src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
-      }));
-    renderTiles(tiles)
-  });
+model.get('pokemon["name", "species"]').then(pokemon   => console.log(pokemon));
+
+ model
+   .getValue('greeting.name')
+   .then((name) => {
+     renderTiles([
+       {
+         title: name,
+         src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
+       },
+       {
+         title: name,
+         src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
+       },
+       {
+         title: name,
+         src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
+       }
+     ])
+   });
+
 
 function renderTiles(tiles) {
   const contentDiv = document.querySelector('#content');
