@@ -32,7 +32,7 @@ const typeColors = {
 //});
 
 model
-  .get('pokedex[0..10]["name"]')
+  .get('pokedex[0..10]["name", "attack", "defense", "hp"]')
   .then((result) => {
     debugger;
     const pokemonObject = result.json.pokedex;
@@ -67,7 +67,11 @@ function tileToHtml(tile) {
       </div>
       <img class="card-img-buttom" src="http://pokeapi.co/${tile.image}" alt="${tile.name}" width="100%">
       <div class="card-block">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        <ul class="list-unstyled card-text">
+        <li>HP: ${tile.hp}</li>
+        <li>Attack: ${tile.attack}</li>
+        <li>Defense: ${tile.defense}</li>
+        </ul>
         <a href="#" class="btn btn-primary">Details &raquo;</a>
       </div>
     </div>
