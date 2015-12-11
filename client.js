@@ -26,13 +26,18 @@ const typeColors = {
 
 //model.get('pokemon["name", "species"]').then(pokemon   => console.log(pokemon));
 
+//model.get('type[1]').then(function (result) {
+//  console.log(result.json)
+//  return result.json;
+//});
+
 model
   .get('pokemon[0..10].["name", "species", "image"]')
   .then((result) => {
     const pokemonObject = result.json.pokemon;
     const pokemonArray = Object.keys(pokemonObject)
       .map(key => pokemonObject[key]);
-    console.log(pokemonArray);
+    //console.log(pokemonArray);
     renderTiles(pokemonArray)
   });
 
