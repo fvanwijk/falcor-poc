@@ -8,7 +8,15 @@ model
     renderTiles([
       {
         title: name,
-        src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg?w=50&h=50'
+        src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
+      },
+      {
+        title: name,
+        src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
+      },
+      {
+        title: name,
+        src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
       }
     ])
   });
@@ -20,5 +28,19 @@ function renderTiles(tiles) {
 }
 
 function tileToHtml(tile) {
-  return `<h2>${tile.title}</h2><img src="${tile.src} alt=${tile.title}"/>`;
+  return `
+  <div class="col-sm-3">
+    <div class="card">
+      <div class="card-block">
+        <h4 class="card-title">${tile.title}</h4>
+        <h6 class="card-subtitle text-muted">Water</h6>
+      </div>
+      <img class="card-img-buttom" src="${tile.src}" alt="${tile.title}" width="100%">
+      <div class="card-block">
+        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        <a href="#" class="btn btn-primary">Details &raquo;</a>
+      </div>
+    </div>
+  </div>
+  `;
 }
