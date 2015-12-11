@@ -4,7 +4,6 @@ var falcorExpress = require('falcor-express');
 var jsong = require('falcor-json-graph');
 var Router = require('falcor-router');
 var fetch = require('node-fetch');
-var jsonGraph = require('jsongraph');
 
 var express = require('express');
 var app = express();
@@ -40,17 +39,22 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
       }
     },
     {
-      // match a request for the key "greeting"
       route: 'pokemonById[{keys:ids}][{keys:props}]',
       get(pathSet) {
         return fetchPathsFromPokeapi(pathSet, 'pokemon');
       }
     },
     {
-      // match a request for the key "greeting"
-      route: 'pokemonById[{keys:ids}].image',
+      route: 'spriteById[{keys:ids}][{keys:props}]',
       get(pathSet) {
         return fetchPathsFromPokeapi(pathSet, 'sprite');
+      }
+    },
+    {
+      route: 'pokemonById[{keys:ids}].sprite',
+      get(pathSet) {
+        return pathSet.ids
+          .map(id => ({path: [pathSet[0], id, pathSet[2]], value: jsong.ref(['spriteById', id])}));
       }
     }
   ]);
