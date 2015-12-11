@@ -3,14 +3,7 @@ var falcorExpress = require('falcor-express');
 var Router = require('falcor-router');
 
 var express = require('express');
-var proxy = require('express-http-proxy');
 var app = express();
-
-app.use('/api', proxy('pokeapi.co', {
-  forwardPath: function(req, res) {
-    return require('url').parse(req.url).path;
-  }
-}));
 
 app.use('/model.json', falcorExpress.dataSourceRoute(function (req, res) {
     // create a Virtual JSON resource with single key ("greeting")
