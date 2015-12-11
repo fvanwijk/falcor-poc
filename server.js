@@ -43,37 +43,32 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
       // match a request for the key "greeting"
       route: 'pokemonById[{keys:ids}][{keys:props}]',
       get(pathSet) {
-        console.log(pathSet);
-        const props = pathSet.props;
-        const pokemonPromises = pathSet.ids
-          .map(id => {
-            const pokemonValue = fetchPropsFromResource(props, `api/v1/pokemon/${id}/`);
-            return pokemonValue
-              .then(pokemonValue => props
-                .map(prop => ({path: [pathSet[0], id, prop], value: pokemonValue[prop]})));
-          });
-
-        return Promise.all(pokemonPromises).then(flatten);
+        return fetchPathsFromPokeapi(pathSet, 'pokemon');
       }
     },
     {
       // match a request for the key "greeting"
       route: 'pokemonById[{keys:ids}].image',
       get(pathSet) {
-        console.log(pathSet);
-        const pokemonPromises = pathSet.ids
-          .map(id => {
-            const prop = pathSet[2]; // is image
-            const pokemonValue = fetchPropsFromResource([pathSet[2]], `api/v1/sprite/${id}/`);
-            return pokemonValue
-              .then(pokemonValue => ({path: [pathSet[0], id, prop], value: pokemonValue[prop]}));
-          });
-
-        return Promise.all(pokemonPromises).then(flatten);
+        return fetchPathsFromPokeapi(pathSet, 'sprite');
       }
     }
   ]);
 }));
+
+function fetchPathsFromPokeapi(pathSet, api) {
+  console.log(pathSet);
+  const props = Array.isArray(pathSet[2]) ? pathSet[2] : [pathSet[2]];
+  const pokemonPromises = pathSet.ids
+    .map(id => {
+      const pokemonValue = fetchPropsFromResource(props, `api/v1/${api}/${id}/`);
+      return pokemonValue
+        .then(pokemonValue => props
+          .map(prop => ({path: [pathSet[0], id, prop], value: pokemonValue[prop]})));
+    });
+
+  return Promise.all(pokemonPromises).then(flatten);
+}
 
 function fetchPropsFromResource(props, resource) {
   return fetchPokeApi(resource)
