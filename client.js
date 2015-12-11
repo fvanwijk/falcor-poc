@@ -26,6 +26,11 @@ const typeColors = {
 
 //model.get('pokemon["name", "species"]').then(pokemon   => console.log(pokemon));
 
+//model.get('type[1]').then(function (result) {
+//  console.log(result.json)
+//  return result.json;
+//});
+
 model
   .get('pokedex[0..10]["name"]')
   .then((result) => {
