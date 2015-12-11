@@ -20,6 +20,7 @@ function renderTiles(tiles) {
 }
 
 function tileToHtml(tile) {
+  tile.src = 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'; // temp
   return `
   <div class="col-sm-3">
     <div class="card">
