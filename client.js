@@ -1,7 +1,7 @@
 const model = new falcor.Model({
   source: new falcor.HttpDataSource('/model.json')});
 
-const speciesColors = {
+const typeColors = {
   Normal: '#9C9C63',
   Fighting: '#AE2A24',
   Flying: '#8E6FEB',
@@ -42,23 +42,23 @@ function renderTiles(tiles) {
     .map(tile => tileToHtml(tile)).join('');
 }
 
-function showBadges(species) {
-  return species.map(function (type) {
-    return `<span class="label" style="background-color: ${speciesColors[type]}">${type}</span>`;
+function showBadges(types) {
+  return types.map(function (type) {
+    return `<span class="label" style="background-color: ${typeColors[type]}">${type}</span>`;
   }).join(' ');
 }
 
 function tileToHtml(tile) {
   // temp
   tile.src = 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg';
-  tile.species = ['Water', 'Fire', 'Normal', 'Fighting'];
+  tile.types = ['Water', 'Fire', 'Normal', 'Fighting'];
 
   return `
   <div class="col-sm-3">
     <div class="card">
       <div class="card-block">
         <h4 class="card-title">${tile.name}</h4>
-        <h6 class="card-subtitle text-muted">${showBadges(tile.species)}</h6>
+        <h6 class="card-subtitle text-muted">${showBadges(tile.types)}</h6>
       </div>
       <img class="card-img-buttom" src="http://pokeapi.co/${tile.image}" alt="${tile.name}" width="100%">
       <div class="card-block">
