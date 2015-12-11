@@ -1,6 +1,7 @@
 'use strict';
 // index.js
 var falcorExpress = require('falcor-express');
+var jsong = require('falcor-json-graph');
 var Router = require('falcor-router');
 var fetch = require('node-fetch');
 
@@ -15,26 +16,40 @@ function filter(list, range) {
   return result;
 }
 
+function parseId(resource) {
+  console.log(resource);
+  return /(\d+)\/$/.exec(resource)[1];
+}
 
 app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
   // create a Virtual JSON resource with single key ("greeting")
   return new Router([
     {
       // match a request for the key "greeting"
-      route: 'pokemon[{keys:range}].[{keys:props}]',
-      // respond with a PathValue with the value of "Hello World."
+      route: 'pokedex[{keys:range}]',
       get(pathSet) {
-        console.log(pathSet);
-        const props = pathSet.props;
         return fetchPokeApi('api/v1/pokedex/1/')
           .then(response => pathSet.range
             .map(i => {
-              const pokemonResource = response.pokemon[i].resource_uri;
-              const pokemonProps = fetchPropsFromResource(props, pokemonResource);
-              return pokemonProps.then(value => ({path: [pathSet[0], i], value}));
+              const pokemonResource = response.pokemon[i];
+              const id = parseId(pokemonResource.resource_uri);
+              return {path: [pathSet[0], i], value: jsong.ref(['pokemonById', id])}
             })
-          )
-          .then(resultPromises => Promise.all(resultPromises));
+          );
+      }
+    },
+    {
+      // match a request for the key "greeting"
+      route: 'pokemonById[{keys:ids}][{keys:props}]',
+      get(pathSet) {
+        const props = pathSet.props;
+        const pokemonPromises = pathSet.ids
+          .map(id => {
+            const pokemonProps = fetchPropsFromResource(props, `api/v1/pokemon/${id}/`);
+            return pokemonProps.then(value => ({path: [pathSet[0], id], value}));
+          });
+
+        return Promise.all(pokemonPromises);
       }
     },
     {
@@ -43,7 +58,7 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
       // respond with a PathValue with the value of "Hello World."
       get(pathSet) {
         const result = [];
-        pathSet.indices.forEach(function(i){
+        pathSet.indices.forEach(function (i) {
           result.push({path: ['pokemon', i, ['image']], value: 'my image'});
         });
         return Promise.resolve(result);
