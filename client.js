@@ -3,22 +3,15 @@ const model = new falcor.Model({
 });
 
 model
-  .getValue('greeting.name')
-  .then((name) => {
-    renderTiles([
-      {
-        title: name,
+  .get('greeting[0..10].name')
+  .then((result) => {
+    const tiles = Object.keys(result.json.greeting)
+      .map(key => result.json.greeting[key])
+      .map(pokemon => ({
+        title: pokemon.name,
         src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
-      },
-      {
-        title: name,
-        src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
-      },
-      {
-        title: name,
-        src: 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'
-      }
-    ])
+      }));
+    renderTiles(tiles)
   });
 
 function renderTiles(tiles) {

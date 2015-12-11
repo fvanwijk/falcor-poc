@@ -14,10 +14,10 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
       route: 'greeting',
       // respond with a PathValue with the value of "Hello World."
       get() {
-        return fetch('http://pokeapi.co/api/v1/pokemon/1')
+        return fetch('http://pokeapi.co/api/v1/pokedex/1/')
           .then(response => response.json())
-          .then(value => ({
-            path: ['greeting'], value
+          .then(response => ({
+            path: ['greeting'], value: response.pokemon
           }));
       }
     }
