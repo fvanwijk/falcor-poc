@@ -1,0 +1,25 @@
+{
+  "name": "falcor-poc",
+  "version": "1.0.0",
+  "description": "This is a sample falcor project",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.13.3",
+    "falcor-express": "^0.1.2",
+    "falcor-router": "^0.2.12"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xebia/falcor-poc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xebia/falcor-poc/issues"
+  },
+  "homepage": "https://github.com/xebia/falcor-poc#readme"
+}
