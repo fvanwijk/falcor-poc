@@ -1,10 +1,10 @@
-var model = new falcor.Model({
+const model = new falcor.Model({
   source: new falcor.HttpDataSource('/model.json')
 });
 
 model
   .getValue('greeting')
-  .then(function(name) {
+  .then((name) => {
     renderTiles([
       {
         title: name,
