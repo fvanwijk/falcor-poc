@@ -1,6 +1,29 @@
 const model = new falcor.Model({
   source: new falcor.HttpDataSource('/model.json')});
 
+const speciesColors = {
+  Normal: '#9C9C63',
+  Fighting: '#AE2A24',
+  Flying: '#8E6FEB',
+  Poison: '#923A92',
+  Ground: '#DBB54D',
+  Rock: '#A48F32',
+  Bug: '#97A51D',
+  Ghost: '#644E88',
+  Steel: '#A0A0C0',
+  Fire: '#ED6D12',
+  Water: '#4578ED',
+  Grass: '#69C23D',
+  Electric: '#F6C913',
+  Ice: '#7ECECE',
+  Dragon: '#5E1DF7',
+  Dark: '#644E40',
+  Fairy: '#E87890',
+  Unknown: '',
+  Shadow: '',
+  Psychic: '#F73670'
+};
+
 //model.get('pokemon["name", "species"]').then(pokemon   => console.log(pokemon));
 
 model
@@ -20,14 +43,23 @@ function renderTiles(tiles) {
     .map(tile => tileToHtml(tile)).join('');
 }
 
+function showBadges(species) {
+  return species.map(function (type) {
+    return `<span class="label" style="background-color: ${speciesColors[type]}">${type}</span>`;
+  }).join(' ');
+}
+
 function tileToHtml(tile) {
-  tile.src = 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg'; // temp
+  // temp
+  tile.src = 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg';
+  tile.species = ['Water', 'Fire', 'Normal', 'Fighting'];
+
   return `
   <div class="col-sm-3">
     <div class="card">
       <div class="card-block">
         <h4 class="card-title">${tile.name}</h4>
-        <h6 class="card-subtitle text-muted">Water</h6>
+        <h6 class="card-subtitle text-muted">${showBadges(tile.species)}</h6>
       </div>
       <img class="card-img-buttom" src="http://pokeapi.co/${tile.image}" alt="${tile.name}" width="100%">
       <div class="card-block">
