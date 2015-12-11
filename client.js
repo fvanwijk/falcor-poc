@@ -1,10 +1,10 @@
 const model = new falcor.Model({
   source: new falcor.HttpDataSource('/model.json')});
 
-model.get('pokemon["name", "species"]').then(pokemon   => console.log(pokemon));
+//model.get('pokemon["name", "species"]').then(pokemon   => console.log(pokemon));
 
 model
-  .get('pokemon[0..10]["name"]')
+  .get('pokemon[0..10].["name", "species"]')
   .then((result) => {
     const pokemonObject = result.json.pokemon;
     const pokemonArray = Object.keys(pokemonObject)
@@ -28,7 +28,7 @@ function tileToHtml(tile) {
         <h4 class="card-title">${tile.name}</h4>
         <h6 class="card-subtitle text-muted">Water</h6>
       </div>
-      <img class="card-img-buttom" src="${tile.src}" alt="${tile.name}" width="100%">
+      <img class="card-img-buttom" src="http://pokeapi.co/media/img/${tile.id}.png" alt="${tile.name}" width="100%">
       <div class="card-block">
         <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
         <a href="#" class="btn btn-primary">Details &raquo;</a>

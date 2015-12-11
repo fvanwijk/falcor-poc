@@ -7,10 +7,10 @@ var fetch = require('node-fetch');
 var express = require('express');
 var app = express();
 
-function filter(pokemons, range) {
+function filter(list, range) {
   const result = [];
   for(var i = range.from; i <= range.to; i++) {
-    result.push(pokemons[i]);
+    result.push(list[i]);
   }
   return result;
 }
@@ -20,27 +20,17 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
   return new Router([
     {
       // match a request for the key "greeting"
-      route: 'pokemon[{ranges:indexRanges}]',
+      route: 'pokemon[{ranges:indexRanges}].["name", "species"]',
       // respond with a PathValue with the value of "Hello World."
       get(pathSet) {
-        const indexRange = pathSet.indexRanges[0];
-        return fetch('http://pokeapi.co/api/v1/pokedex/1/')
-          .then(response => response.json())
-          .then(response => ({
-            path: ['pokemon'], value: filter(response.pokemon, indexRange)
-          }));
+        const result = [];
+        const range = pathSet.indexRanges[0];
+        for(var i = range.from; i <= range.to; i++) {
+          result.push({path: ['pokemon', i, ['name', 'species']], value: 'ssdsdf'});
+        }
+        return Promise.resolve(result);
       }
-    },{
-    route: 'pokemon["name", "species"]',
-    get() {
-      return fetch('http://pokeapi.co/api/v1/pokemon/1')
-        .then(response => response.json())
-        .then(pokemon => ([
-          {path:['pokemon', 'name'], value:pokemon.name},
-          {path:['pokemon', 'species'], value:pokemon.species}
-        ]));
     }
-}
 
   ]);
 }));
