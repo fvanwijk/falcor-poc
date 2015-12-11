@@ -3,7 +3,7 @@ const model = new falcor.Model({
 });
 
 model
-  .getValue('greeting')
+  .getValue('greeting.name')
   .then((name) => {
     renderTiles([
       {
