@@ -57,14 +57,19 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
       }
     },
     {
-      route: 'type[{integers:typeId}]',
+      // match a request for the key "greeting"
+      route: 'pokemonById[{keys:ids}].image',
       get(pathSet) {
-        return fetchPokeApi(`api/v1/type/${pathSet.typeId[0]}/`)
-          .then(function (response) {
-            return {
-              path: ['type'], value: response.name
-            };
+        console.log(pathSet);
+        const pokemonPromises = pathSet.ids
+          .map(id => {
+            const prop = pathSet[2]; // is image
+            const pokemonValue = fetchPropsFromResource([pathSet[2]], `api/v1/sprite/${id}/`);
+            return pokemonValue
+              .then(pokemonValue => ({path: [pathSet[0], id, prop], value: pokemonValue[prop]}));
           });
+
+        return Promise.all(pokemonPromises).then(flatten);
       }
     }
   ]);
