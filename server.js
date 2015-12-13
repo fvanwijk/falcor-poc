@@ -15,9 +15,26 @@ function parseId(resource) {
 app.use('/model.json', falcorExpress.dataSourceRoute(() => {
   return new Router(flatten([
     idRouteWithArrayPropertyRoutes('pokedex', {pokemon: 'pokemon'}),
-    idRouteWithArrayPropertyRoutes('pokemon', {types: 'type', sprites: 'sprite'}),
+    idRouteWithArrayPropertyRoutes('pokemon', {
+      types: 'type',
+      sprites: 'sprite',
+      abilities: 'ability',
+      egg_groups: 'egg',
+      move: 'move',
+      descriptions: 'description'
+    }),
     idRouteWithArrayPropertyRoutes('sprite'),
-    idRouteWithArrayPropertyRoutes('type')
+    idRouteWithArrayPropertyRoutes('type', {
+      ineffective: 'type',
+      no_effect: 'type',
+      resistance: 'type',
+      super_effective: 'type',
+      weakness: 'type'
+    }),
+    idRouteWithArrayPropertyRoutes('ability'),
+    idRouteWithArrayPropertyRoutes('egg'),
+    idRouteWithArrayPropertyRoutes('description'),
+    idRouteWithArrayPropertyRoutes('move')
   ]));
 }));
 

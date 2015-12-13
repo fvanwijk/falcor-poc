@@ -1,5 +1,6 @@
 const model = new falcor.Model({
-  source: new falcor.HttpDataSource('/model.json')});
+  source: new falcor.HttpDataSource('/model.json')
+});
 
 const typeColors = {
   Normal: '#9C9C63',
@@ -32,9 +33,12 @@ const typeColors = {
 //});
 
 model
-  .get('pokedexById[1].pokemon[0..10]["name", "attack", "national_id", "defense", "hp"]','pokedexById[1].pokemon[0..10].sprites[0].image','pokedexById[1].pokemon[0..10].types[0..10].name')
+  .get(
+    'pokedexById[1].pokemon[0..10]["name", "attack", "national_id", "defense", "hp"]',
+    'pokedexById[1].pokemon[0..10].sprites[0].image',
+    'pokedexById[1].pokemon[0..10].types[0..10].name',
+    'pokedexById[1].pokemon[0..10].descriptions[0].description')
   .then((result) => {
-    debugger;
     const pokemonObject = result.json.pokedexById[1].pokemon;
     const pokemonArray = Object.keys(pokemonObject)
       .map(key => pokemonObject[key]);
@@ -63,10 +67,11 @@ function tileToHtml(tile) {
       <div class="card-block">${showBadges(tile.types)}</div>
       <img class="card-img-buttom" src="http://pokeapi.co/${tile.sprites[0].image}" alt="${tile.name}" max-width="100%">
       <div class="card-block">
+        <p>${tile.descriptions[0].description}</p>
         <ul class="list-unstyled card-text">
-        <li>HP: ${tile.hp}</li>
-        <li>Attack: ${tile.attack}</li>
-        <li>Defense: ${tile.defense}</li>
+          <li>HP: ${tile.hp}</li>
+          <li>Attack: ${tile.attack}</li>
+          <li>Defense: ${tile.defense}</li>
         </ul>
         <a href="#" class="btn btn-primary">Details &raquo;</a>
       </div>
