@@ -14,66 +14,43 @@ function parseId(resource) {
 
 app.use('/model.json', falcorExpress.dataSourceRoute(() => {
   return new Router([
-    {
-      route: 'pokedex[{keys:range}]',
-      get(pathSet) {
-        console.log(pathSet);
-        return fetchPokeApi('api/v1/pokedex/1/')
-          .then(response => pathSet.range
-            .map(i => {
-              const pokemonResource = response.pokemon[i];
-              const id = parseId(pokemonResource.resource_uri);
-              return {path: [pathSet[0], i], value: jsong.ref(['pokemonById', id])}
-            })
-          );
-      }
-    },
-    {
-      route: 'pokemonById[{keys:ids}][{keys:props}]',
-      get(pathSet) {
-        console.log('pokemonById[{keys:ids}][{keys:props}]', pathSet);
-        return fetchPathsFromPokeapi(pathSet, 'pokemon')
-          .then(r => {
-            debugger;
-            console.log(JSON.stringify(r));
-            return r;
-          });
-      }
-    },
-    arrayProperty('types', 'typeById'),
-    arrayProperty('sprites', 'spriteById'),
-    {
-      route: 'spriteById[{keys:ids}][{keys:props}]',
-      get(pathSet) {
-        console.log('spriteById[{keys:ids}][{keys:props}]', pathSet);
-        return fetchPathsFromPokeapi(pathSet, 'sprite');
-      }
-    },
-    {
-      route: 'typeById[{keys:ids}][{keys:props}]',
-      get(pathSet) {
-        console.log('typeById', pathSet);
-        return fetchPathsFromPokeapi(pathSet, 'type');
-      }
-    }
+    byIdRoute('pokedex'),
+    arrayPropertyRoute('pokedex', 'pokemon', 'pokemon'),
+    byIdRoute('pokemon'),
+    arrayPropertyRoute('pokemon', 'types', 'type'),
+    arrayPropertyRoute('pokemon', 'sprites', 'sprite'),
+    byIdRoute('sprite'),
+    byIdRoute('type')
   ]);
 }));
 
-function arrayProperty(property, resourceById) {
+function byIdRoute(resource) {
   return {
-    route: `pokemonById[{keys:ids}].${property}[{keys:typeIndexes}]`,
+    route: `${resource}ById[{keys:ids}][{keys:props}]`,
     get(pathSet) {
-      console.log(`pokemonById[{keys:ids}].${property}[{keys:typeIndexes}]`, pathSet);
-      return fetchPathsFromPokeapi(pathSet, 'pokemon')
+      console.log(`${resource}ById[{keys:ids}][{keys:props}]`, pathSet);
+      return fetchPathsFromPokeapi(pathSet, resource);
+    }
+  };
+}
+
+function arrayPropertyRoute(resource, property, arrayResource) {
+  return {
+    route: `${resource}ById[{keys:ids}].${property}[{keys:arrayIndexes}]`,
+    get(pathSet) {
+      console.log(`${resource}ById[{keys:ids}].${property}[{keys:arrayIndexes}]`, pathSet);
+      return fetchPathsFromPokeapi(pathSet, resource)
         .then(results => {
           return results.map((result) => {
-            return result.value.map((type, i) => {
-              const id = parseId(type.resource_uri);
-              return {
-                path: result.path.concat(i),
-                value: jsong.ref([resourceById, id])
-              };
-            });
+            return result.value
+              .filter((_, i) => i in pathSet.arrayIndexes)
+              .map((element, i) => {
+                const id = parseId(element.resource_uri);
+                return {
+                  path: result.path.concat(i),
+                  value: jsong.ref([`${arrayResource}ById`, id])
+                };
+              });
           })
         })
         .then(flatten).then(r => {

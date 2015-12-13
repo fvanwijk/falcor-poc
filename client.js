@@ -32,9 +32,10 @@ const typeColors = {
 //});
 
 model
-  .get('pokedex[0..10]["name", "attack", "national_id", "defense", "hp"]','pokedex[0..10].sprites[0].image','pokedex[0..10].types[0..10].name')
+  .get('pokedexById[1].pokemon[0..10]["name", "attack", "national_id", "defense", "hp"]','pokedexById[1].pokemon[0..10].sprites[0].image','pokedexById[1].pokemon[0..10].types[0..10].name')
   .then((result) => {
-    const pokemonObject = result.json.pokedex;
+    debugger;
+    const pokemonObject = result.json.pokedexById[1].pokemon;
     const pokemonArray = Object.keys(pokemonObject)
       .map(key => pokemonObject[key]);
     renderTiles(pokemonArray)
