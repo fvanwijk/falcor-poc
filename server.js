@@ -22,7 +22,7 @@ app.use('/model.json', falcorExpress.dataSourceRoute(() => {
       sprites: 'sprite',
       abilities: 'ability',
       egg_groups: 'egg',
-      move: 'move',
+      moves: 'move',
       descriptions: 'description',
       evolutions: 'pokemon'
     }),
