@@ -13,16 +13,21 @@ function parseId(resource) {
 }
 
 app.use('/model.json', falcorExpress.dataSourceRoute(() => {
-  return new Router([
-    byIdRoute('pokedex'),
-    arrayPropertyRoute('pokedex', 'pokemon', 'pokemon'),
-    byIdRoute('pokemon'),
-    arrayPropertyRoute('pokemon', 'types', 'type'),
-    arrayPropertyRoute('pokemon', 'sprites', 'sprite'),
-    byIdRoute('sprite'),
-    byIdRoute('type')
-  ]);
+  return new Router(flatten([
+    idRouteWithArrayPropertyRoutes('pokedex', {pokemon: 'pokemon'}),
+    idRouteWithArrayPropertyRoutes('pokemon', {types: 'type', sprites: 'sprite'}),
+    idRouteWithArrayPropertyRoutes('sprite'),
+    idRouteWithArrayPropertyRoutes('type')
+  ]));
 }));
+
+function idRouteWithArrayPropertyRoutes(resource, arrayPropertyToResourceMap) {
+  const arrayPropertyRoutes = arrayPropertyToResourceMap ?
+    Object.keys(arrayPropertyToResourceMap).map(key => {
+      return arrayPropertyRoute(resource, key, arrayPropertyToResourceMap[key])
+    }) : [];
+  return flatten([byIdRoute(resource), arrayPropertyRoutes]);
+}
 
 function byIdRoute(resource) {
   return {
