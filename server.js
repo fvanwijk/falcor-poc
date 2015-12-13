@@ -12,7 +12,7 @@ function parseId(resource) {
   return /(\d+)\/$/.exec(resource)[1];
 }
 
-app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
+app.use('/model.json', falcorExpress.dataSourceRoute(() => {
   return new Router([
     {
       route: 'pokedex[{keys:range}]',
@@ -40,50 +40,8 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
           });
       }
     },
-    {
-      route: 'pokemonById[{keys:ids}].types[{keys:typeIndexes}]',
-      get(pathSet) {
-        console.log('pokemonById[{keys:ids}].types[{keys:typeIndexes}]', pathSet);
-        return fetchPathsFromPokeapi(pathSet, 'pokemon')
-          .then(results => {
-            return results.map((result) => {
-              return result.value.map((type, i) => {
-                const id = parseId(type.resource_uri);
-                return {
-                  path: result.path.concat(i),
-                  value: jsong.ref(['typeById', id])
-                };
-              });
-            })
-          })
-          .then(flatten).then(r => {
-            debugger;
-            console.log(JSON.stringify(r));
-            return r;
-          });
-      }
-    },
-    {
-      route: 'pokemonById[{keys:ids}].sprite',
-      get(pathSet) {
-        console.log('pokemonById[{keys:ids}].sprite', pathSet);
-        return fetchPathsFromPokeapi(pathSet, 'pokemon')
-          .then(results => {
-            return results.map((result) => {
-              const id = result.path[1];
-              return {
-                path: result.path,
-                value: jsong.ref(['spriteById', id])
-              };
-            })
-          })
-          .then(r => {
-            debugger;
-            console.log(JSON.stringify(r));
-            return r;
-          });
-      }
-    },
+    arrayProperty('types', 'typeById'),
+    arrayProperty('sprites', 'spriteById'),
     {
       route: 'spriteById[{keys:ids}][{keys:props}]',
       get(pathSet) {
@@ -100,6 +58,32 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
     }
   ]);
 }));
+
+function arrayProperty(property, resourceById) {
+  return {
+    route: `pokemonById[{keys:ids}].${property}[{keys:typeIndexes}]`,
+    get(pathSet) {
+      console.log(`pokemonById[{keys:ids}].${property}[{keys:typeIndexes}]`, pathSet);
+      return fetchPathsFromPokeapi(pathSet, 'pokemon')
+        .then(results => {
+          return results.map((result) => {
+            return result.value.map((type, i) => {
+              const id = parseId(type.resource_uri);
+              return {
+                path: result.path.concat(i),
+                value: jsong.ref([resourceById, id])
+              };
+            });
+          })
+        })
+        .then(flatten).then(r => {
+          debugger;
+          console.log(JSON.stringify(r));
+          return r;
+        });
+    }
+  };
+}
 
 function fetchPathsFromPokeapi(pathSet, api) {
   const props = Array.isArray(pathSet[2]) ? pathSet[2] : [pathSet[2]];
@@ -141,7 +125,7 @@ function fetchPokeApi(resource) {
 }
 
 function flatten(array) {
-  var flattened = Array.prototype.concat.apply([], array);
+  const flattened = Array.prototype.concat.apply([], array);
   console.log(flattened);
   return flattened;
 }
@@ -150,4 +134,4 @@ function flatten(array) {
 app.use(express.static(__dirname + '/'));
 
 console.log('Server listening on http://localhost:3000');
-var server = app.listen(3000);
+app.listen(3000);

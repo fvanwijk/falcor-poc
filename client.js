@@ -32,7 +32,7 @@ const typeColors = {
 //});
 
 model
-  .get('pokedex[0..10]["name", "attack", "national_id", "defense", "hp"]','pokedex[0..10].sprite.image','pokedex[0..10].types[0..10].name')
+  .get('pokedex[0..10]["name", "attack", "national_id", "defense", "hp"]','pokedex[0..10].sprites[0].image','pokedex[0..10].types[0..10].name')
   .then((result) => {
     const pokemonObject = result.json.pokedex;
     const pokemonArray = Object.keys(pokemonObject)
@@ -62,7 +62,7 @@ function tileToHtml(tile) {
         <h4 class="card-title">${tile.name}</h4>
         <h6 class="card-subtitle text-muted">${showBadges(tile.types)}</h6>
       </div>
-      <img class="card-img-buttom" src="http://pokeapi.co/${tile.sprite.image}" alt="${tile.name}" width="100%">
+      <img class="card-img-buttom" src="http://pokeapi.co/${tile.sprites[0].image}" alt="${tile.name}" width="100%">
       <div class="card-block">
         <ul class="list-unstyled card-text">
         <li>HP: ${tile.hp}</li>
