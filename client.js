@@ -58,12 +58,10 @@ function showBadges(types) {
 function tileToHtml(tile) {
   return `
   <div class="col-sm-3">
-    <div class="card">
-      <div class="card-block">
-        <h4 class="card-title">${tile.name}</h4>
-        <h6 class="card-subtitle text-muted">${showBadges(tile.types)}</h6>
-      </div>
-      <img class="card-img-buttom" src="http://pokeapi.co/${tile.sprites[0].image}" alt="${tile.name}" width="100%">
+    <div class="card text-sm-center">
+      <div class="card-header">${tile.name}</div>
+      <div class="card-block">${showBadges(tile.types)}</div>
+      <img class="card-img-buttom" src="http://pokeapi.co/${tile.sprites[0].image}" alt="${tile.name}" max-width="100%">
       <div class="card-block">
         <ul class="list-unstyled card-text">
         <li>HP: ${tile.hp}</li>
