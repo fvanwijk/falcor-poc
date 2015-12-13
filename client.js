@@ -32,7 +32,7 @@ const typeColors = {
 //});
 
 model
-  .get('pokedex[0..10]["name", "attack", "national_id", "defense", "hp", "image", "sprite"].image')
+  .get('pokedex[0..10]["name", "attack", "national_id", "defense", "hp"]','pokedex[0..10].sprite.image','pokedex[0..10].types[0..10].name')
   .then((result) => {
     const pokemonObject = result.json.pokedex;
     const pokemonArray = Object.keys(pokemonObject)
@@ -47,16 +47,14 @@ function renderTiles(tiles) {
 }
 
 function showBadges(types) {
-  return types.map(function (type) {
-    return `<span class="label" style="background-color: ${typeColors[type]}">${type}</span>`;
+  return Object.keys(types).map(function (typeKey) {
+    const typeName = types[typeKey].name;
+    const typeColor = typeColors[typeName];
+    return `<span class="label" style="background-color: ${typeColor}">${typeName}</span>`;
   }).join(' ');
 }
 
 function tileToHtml(tile) {
-  // temp
-  tile.src = 'https://zemanifesto.files.wordpress.com/2014/07/bravecor1.jpg';
-  tile.types = ['Water', 'Fire', 'Normal', 'Fighting'];
-
   return `
   <div class="col-sm-3">
     <div class="card">

@@ -8,23 +8,13 @@ var fetch = require('node-fetch');
 var express = require('express');
 var app = express();
 
-function filter(list, range) {
-  const result = [];
-  for(var i = range.from; i <= range.to; i++) {
-    result.push(list[i]);
-  }
-  return result;
-}
-
 function parseId(resource) {
   return /(\d+)\/$/.exec(resource)[1];
 }
 
 app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
-  // create a Virtual JSON resource with single key ("greeting")
   return new Router([
     {
-      // match a request for the key "greeting"
       route: 'pokedex[{keys:range}]',
       get(pathSet) {
         console.log(pathSet);
@@ -41,27 +31,77 @@ app.use('/model.json', falcorExpress.dataSourceRoute((req, res) => {
     {
       route: 'pokemonById[{keys:ids}][{keys:props}]',
       get(pathSet) {
-        return fetchPathsFromPokeapi(pathSet, 'pokemon');
+        console.log('pokemonById[{keys:ids}][{keys:props}]', pathSet);
+        return fetchPathsFromPokeapi(pathSet, 'pokemon')
+          .then(r => {
+            debugger;
+            console.log(JSON.stringify(r));
+            return r;
+          });
       }
     },
     {
-      route: 'spriteById[{keys:ids}][{keys:props}]',
+      route: 'pokemonById[{keys:ids}].types[{keys:typeIndexes}]',
       get(pathSet) {
-        return fetchPathsFromPokeapi(pathSet, 'sprite');
+        console.log('pokemonById[{keys:ids}].types[{keys:typeIndexes}]', pathSet);
+        return fetchPathsFromPokeapi(pathSet, 'pokemon')
+          .then(results => {
+            return results.map((result) => {
+              return result.value.map((type, i) => {
+                const id = parseId(type.resource_uri);
+                return {
+                  path: result.path.concat(i),
+                  value: jsong.ref(['typeById', id])
+                };
+              });
+            })
+          })
+          .then(flatten).then(r => {
+            debugger;
+            console.log(JSON.stringify(r));
+            return r;
+          });
       }
     },
     {
       route: 'pokemonById[{keys:ids}].sprite',
       get(pathSet) {
-        return pathSet.ids
-          .map(id => ({path: [pathSet[0], id, pathSet[2]], value: jsong.ref(['spriteById', id])}));
+        console.log('pokemonById[{keys:ids}].sprite', pathSet);
+        return fetchPathsFromPokeapi(pathSet, 'pokemon')
+          .then(results => {
+            return results.map((result) => {
+              const id = result.path[1];
+              return {
+                path: result.path,
+                value: jsong.ref(['spriteById', id])
+              };
+            })
+          })
+          .then(r => {
+            debugger;
+            console.log(JSON.stringify(r));
+            return r;
+          });
+      }
+    },
+    {
+      route: 'spriteById[{keys:ids}][{keys:props}]',
+      get(pathSet) {
+        console.log('spriteById[{keys:ids}][{keys:props}]', pathSet);
+        return fetchPathsFromPokeapi(pathSet, 'sprite');
+      }
+    },
+    {
+      route: 'typeById[{keys:ids}][{keys:props}]',
+      get(pathSet) {
+        console.log('typeById', pathSet);
+        return fetchPathsFromPokeapi(pathSet, 'type');
       }
     }
   ]);
 }));
 
 function fetchPathsFromPokeapi(pathSet, api) {
-  console.log(pathSet);
   const props = Array.isArray(pathSet[2]) ? pathSet[2] : [pathSet[2]];
   const pokemonPromises = pathSet.ids
     .map(id => {
@@ -88,12 +128,22 @@ function fetchPropsFromResource(props, resource) {
 
 const endpoint = 'http://pokeapi.co/';
 function fetchPokeApi(resource) {
+  console.log('fetch', resource);
   return fetch(`${endpoint}${resource}`)
-    .then(response => response.json());
+    .then(response => {
+      if (!response.ok) {
+        const errorMsg = `Exception during fetching ${response.url}: ${response.status} ${response.statusText}`;
+        console.error(errorMsg);
+        throw new Error(errorMsg)
+      }
+      return response.json();
+    });
 }
 
 function flatten(array) {
-  return Array.prototype.concat.apply([], array);
+  var flattened = Array.prototype.concat.apply([], array);
+  console.log(flattened);
+  return flattened;
 }
 
 // serve static files from current directory
