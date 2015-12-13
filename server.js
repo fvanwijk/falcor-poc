@@ -14,8 +14,8 @@ function parseId(resource) {
 
 app.use('/model.json', falcorExpress.dataSourceRoute(() => {
   return new Router(flatten([
-    idRouteWithArrayPropertyRoutes('pokedex', {pokemon: 'pokemon'}),
-    idRouteWithArrayPropertyRoutes('pokemon', {
+    idRouteWithPropertyRoutes('pokedex', {pokemon: 'pokemon'}),
+    idRouteWithPropertyRoutes('pokemon', {
       types: 'type',
       sprites: 'sprite',
       abilities: 'ability',
@@ -23,25 +23,25 @@ app.use('/model.json', falcorExpress.dataSourceRoute(() => {
       move: 'move',
       descriptions: 'description'
     }),
-    idRouteWithArrayPropertyRoutes('sprite'),
-    idRouteWithArrayPropertyRoutes('type', {
+    idRouteWithPropertyRoutes('sprite'),
+    idRouteWithPropertyRoutes('type', {
       ineffective: 'type',
       no_effect: 'type',
       resistance: 'type',
       super_effective: 'type',
       weakness: 'type'
     }),
-    idRouteWithArrayPropertyRoutes('ability'),
-    idRouteWithArrayPropertyRoutes('egg'),
-    idRouteWithArrayPropertyRoutes('description'),
-    idRouteWithArrayPropertyRoutes('move')
+    idRouteWithPropertyRoutes('ability'),
+    idRouteWithPropertyRoutes('egg'),
+    idRouteWithPropertyRoutes('description'),
+    idRouteWithPropertyRoutes('move')
   ]));
 }));
 
-function idRouteWithArrayPropertyRoutes(resource, arrayPropertyToResourceMap) {
-  const arrayPropertyRoutes = arrayPropertyToResourceMap ?
-    Object.keys(arrayPropertyToResourceMap).map(key => {
-      return arrayPropertyRoute(resource, key, arrayPropertyToResourceMap[key])
+function idRouteWithPropertyRoutes(resource, referenceArrayProperties) {
+  const arrayPropertyRoutes = referenceArrayProperties ?
+    Object.keys(referenceArrayProperties).map(key => {
+      return referenceArrayPropertyRoute(resource, key, referenceArrayProperties[key])
     }) : [];
   return flatten([byIdRoute(resource), arrayPropertyRoutes]);
 }
@@ -56,7 +56,7 @@ function byIdRoute(resource) {
   };
 }
 
-function arrayPropertyRoute(resource, property, arrayResource) {
+function referenceArrayPropertyRoute(resource, property, arrayResource) {
   return {
     route: `${resource}ById[{keys:ids}].${property}[{keys:arrayIndexes}]`,
     get(pathSet) {
