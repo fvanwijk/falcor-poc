@@ -23,9 +23,10 @@ app.use('/model.json', falcorExpress.dataSourceRoute(() => {
       abilities: 'ability',
       egg_groups: 'egg',
       move: 'move',
-      descriptions: 'description'
+      descriptions: 'description',
+      evolutions: 'pokemon'
     }),
-    idRouteWithPropertyRoutes('sprite'),
+    idRouteWithPropertyRoutes('sprite', null, {pokemon: 'pokemon'}),
     idRouteWithPropertyRoutes('type', {
       ineffective: 'type',
       no_effect: 'type',
@@ -35,17 +36,22 @@ app.use('/model.json', falcorExpress.dataSourceRoute(() => {
     }),
     idRouteWithPropertyRoutes('ability'),
     idRouteWithPropertyRoutes('egg'),
-    idRouteWithPropertyRoutes('description'),
-    idRouteWithPropertyRoutes('move')
+    idRouteWithPropertyRoutes('description', {games: 'game'}),
+    idRouteWithPropertyRoutes('move'),
+    idRouteWithPropertyRoutes('game')
   ]));
 }));
 
-function idRouteWithPropertyRoutes(resource, referenceArrayProperties) {
+function idRouteWithPropertyRoutes(resource, referenceArrayProperties, referenceProperties) {
   const arrayPropertyRoutes = referenceArrayProperties ?
     Object.keys(referenceArrayProperties).map(key => {
       return referenceArrayPropertyRoute(resource, key, referenceArrayProperties[key])
     }) : [];
-  return flatten([byIdRoute(resource), arrayPropertyRoutes]);
+  const referencePropertyRoutes = referenceProperties ?
+    Object.keys(referenceProperties).map(key => {
+      return referencePropertyRoute(resource, key, referenceProperties[key])
+    }) : [];
+  return flatten([byIdRoute(resource), arrayPropertyRoutes, referencePropertyRoutes]);
 }
 
 function byIdRoute(resource) {
@@ -75,6 +81,26 @@ function referenceArrayPropertyRoute(resource, property, arrayResource) {
                   value: jsong.ref([`${arrayResource}ById`, id])
                 };
               });
+          })
+        })
+        .then(flatten);
+    }
+  };
+}
+
+function referencePropertyRoute(resource, property, propertyResource) {
+  return {
+    route: `${resource}ById[{keys:ids}].${property}`,
+    get(pathSet) {
+      //console.log(`${resource}ById[{keys:ids}].${property}`, pathSet);
+      return fetchPathsFromPokeapi(pathSet, resource)
+        .then(results => {
+          return results.map((result) => {
+            const id = parseId(result.value.resource_uri);
+            return {
+              path: result.path,
+              value: jsong.ref([`${propertyResource}ById`, id])
+            };
           })
         })
         .then(flatten);

@@ -25,13 +25,6 @@ const typeColors = {
   Psychic: '#F73670'
 };
 
-//model.get('pokemon["name", "species"]').then(pokemon   => console.log(pokemon));
-
-//model.get('type[1]').then(function (result) {
-//  console.log(result.json)
-//  return result.json;
-//});
-
 model
   .get(
     'pokedexById[1].pokemon[0..10]["name", "attack", "national_id", "defense", "hp"]',
