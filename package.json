@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "bootstrap": "4.0.0-alpha.2",
+    "cache-manager": "^1.2.2",
     "express": "^4.13.3",
     "falcor-express": "^0.1.2",
     "falcor-json-graph": "^1.1.7",

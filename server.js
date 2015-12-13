@@ -1,12 +1,14 @@
 'use strict';
 // index.js
-var falcorExpress = require('falcor-express');
-var jsong = require('falcor-json-graph');
-var Router = require('falcor-router');
-var fetch = require('node-fetch');
+const falcorExpress = require('falcor-express');
+const jsong = require('falcor-json-graph');
+const Router = require('falcor-router');
+const fetch = require('node-fetch');
+const express = require('express');
+const cacheManager = require('cache-manager');
 
-var express = require('express');
-var app = express();
+
+const app = express();
 
 function parseId(resource) {
   return /(\d+)\/$/.exec(resource)[1];
@@ -50,7 +52,7 @@ function byIdRoute(resource) {
   return {
     route: `${resource}ById[{keys:ids}][{keys:props}]`,
     get(pathSet) {
-      console.log(`${resource}ById[{keys:ids}][{keys:props}]`, pathSet);
+      //console.log(`${resource}ById[{keys:ids}][{keys:props}]`, pathSet);
       return fetchPathsFromPokeapi(pathSet, resource);
     }
   };
@@ -60,7 +62,7 @@ function referenceArrayPropertyRoute(resource, property, arrayResource) {
   return {
     route: `${resource}ById[{keys:ids}].${property}[{keys:arrayIndexes}]`,
     get(pathSet) {
-      console.log(`${resource}ById[{keys:ids}].${property}[{keys:arrayIndexes}]`, pathSet);
+      //console.log(`${resource}ById[{keys:ids}].${property}[{keys:arrayIndexes}]`, pathSet);
       return fetchPathsFromPokeapi(pathSet, resource)
         .then(results => {
           return results.map((result) => {
@@ -75,11 +77,7 @@ function referenceArrayPropertyRoute(resource, property, arrayResource) {
               });
           })
         })
-        .then(flatten).then(r => {
-          debugger;
-          console.log(JSON.stringify(r));
-          return r;
-        });
+        .then(flatten);
     }
   };
 }
@@ -98,7 +96,7 @@ function fetchPathsFromPokeapi(pathSet, api) {
 }
 
 function fetchPropsFromResource(props, resource) {
-  return fetchPokeApi(resource)
+  return fetchPokeApiCached(resource)
     .then(response => {
         const result = {};
         props.map(prop => {
@@ -107,6 +105,27 @@ function fetchPropsFromResource(props, resource) {
         return result;
       }
     );
+}
+
+const memoryCache = cacheManager.caching({store: 'memory', max: 100, ttl: 10/*seconds*/});
+function fetchPokeApiCached(resource) {
+  return new Promise((resolve, reject) => {
+    function work(cb) {
+      fetchPokeApi(resource)
+        .then(_ => cb(null, _))
+        .catch(cb)
+    }
+
+    function onResult(err, result) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(result);
+      }
+    }
+
+    memoryCache.wrap(resource, work, onResult);
+  });
 }
 
 const endpoint = 'http://pokeapi.co/';
@@ -124,9 +143,7 @@ function fetchPokeApi(resource) {
 }
 
 function flatten(array) {
-  const flattened = Array.prototype.concat.apply([], array);
-  console.log(flattened);
-  return flattened;
+  return Array.prototype.concat.apply([], array);
 }
 
 // serve static files from current directory
